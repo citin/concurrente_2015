@@ -5,7 +5,7 @@
   persona lo puede utilizar caso contrario debe esperar).
 
 sem e = 1  
-## process P [i= 1 to n]
+### process P [i= 1 to n]
   P(e)
   -- Ingreso al detector
   V(e)
@@ -15,7 +15,7 @@ sem e = 1
   personas a la vez.
 
 sem e = 3
-## process P [i= 1 to n]
+### process P [i= 1 to n]
   P(e)
   -- Ingreso al detector
   V(e)
@@ -30,7 +30,7 @@ Cola buffer
 sem e = 1
 sem recurso = 5
 
-## process proceso [i = 1 to n]
+### process proceso [i = 1 to n]
 
   P(recurso)
 
@@ -61,7 +61,7 @@ sem tarea_asignada[40] = 0
 sem e = 1
 sem profe = 0
 sem esperando_nota = 0
-##process alumno [i = 1 to 40]
+###process alumno [i = 1 to 40]
 
 > Espero hasta que tenga tarea asignada
   P( tarea_asignada[i] )
@@ -105,7 +105,7 @@ sem esperando_nota = 0
     todos= 0
     tarea_en_cuestion= 0
     notas[10]= 0
-## process alumno[ i= 1 to 10 ]
+### process alumno[ i= 1 to 10 ]
     tarea_asignada= elegir()
     > Espero que todos tengan su tarea asignada
     P( e )
@@ -123,7 +123,7 @@ sem esperando_nota = 0
     tarea_en_cuestion= tarea_asignada
     V( profedor )
 
-## process profesor
+### process profesor
     nota_actual= 10
     termino= false
     while ( !termino ) {
@@ -158,7 +158,7 @@ sem tareas[N]= 0     'tareas para corregir'
 estado[ N ]= ""
 Cola cola
 
-## process alumno [ id= 1 to N ]
+### process alumno [ id= 1 to N ]
   P( s_cola )
   estado[ id ]= "en cola"
   push( cola, id )
@@ -167,7 +167,7 @@ Cola cola
   V( s_timer[ id ] )
 > Espero x las condiciones
   P( esperando[id] )
-  P( s_estado )                                ##__???__
+  P( s_estado )                                ###__???__
 > si estroy corrigiendo (sino me fui por timer, saltea while)
   while (estado[ id ]= "en correccion") {
 >   habilito el ayudante para que me corrija
@@ -178,7 +178,7 @@ Cola cola
   }        
   V( s_estado )
 
-## process timer [ id= 1 to N ]
+### process timer [ id= 1 to N ]
   P( s_timer[ id ] )
   DELAY( 15 )
   P( s_estado )
@@ -187,7 +187,7 @@ Cola cola
     V( esperando[ id ] )
   V( s_estado )
   
-## process ayudante [ id= 1 to A ]
+### process ayudante [ id= 1 to A ]
   
   while( true ) { 
     P( s_cola )
@@ -222,7 +222,7 @@ sem todos= 0
 cont= 0
 tareas= 0
 tareas_x_empleado[E]= 0
-## process empleados [id= 1 to E]
+### process empleados [id= 1 to E]
   P( s_todos )
   cont++
   if cont < E
@@ -263,7 +263,7 @@ sem cinco= 0
 sem tarea_grupo[ N ]
 cont= 0
 tarea_actual= 1
-## process operario[ id= 1 to N ]
+### process operario[ id= 1 to N ]
   P( s_cinco )
   if ( cont < 5 )
     cont++
@@ -282,13 +282,13 @@ tarea_actual= 1
 sem s_cola= 1
 sem tarea[ N ]= 0
 Cola cola
-## process operario[ id= 1 to N ]
+### process operario[ id= 1 to N ]
   P( s_cola )
   push( cola, id )
   V( s_cola )
   P( tarea[ id ] )
 
-## process fabrica
+### process fabrica
   while true { 
     P( s_cola )
     pop( cola, id )
