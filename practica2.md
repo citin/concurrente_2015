@@ -183,7 +183,6 @@
     V( s_estado[id] )
 
      process timer [ id= 1 to N ]
-     while ( true ) {
       P( s_timer[ id ] )
       DELAY( 15 )
       P( s_estado[id] )
@@ -191,7 +190,6 @@
         estado[ id ]= "me fui"
         V( esperando[ id ] )
       V( s_estado[id] )
-      }
       
      process ayudante [ id= 1 to A ]
 
@@ -348,35 +346,58 @@ esperando) que le llegó su turno para descargar.
     Cola cola
     sem s_cola= 1
 
-    sem s_condiciones[ N ]= 0
-    sem s_timer[ N ]
+    sem s_turno[ N ]= 0
+    sem s_timer[ N ]= 0
     
-    estados[ N ] = ""
+    estados[ N ] = "esperando"
     sem s_esados[ N ]= 1
 
     process camion [ id= 1 to N ] 
-      P( s_estados[ id ] )
-      estados[ id ]= "en cola"
-      V( s_estados[ id ] )
+
+      >si la cola esta libre 
+      >   digo que es mi turno
+      >
+      > activo el timer
+      > me encolo
+      > P( mi turno )
+
+      P( s_cola )
+      if ( cola.empty )
+        V( s_cola )
+        V( s_turno[ id ] )
+        p( s_cola )
+      V( s_cola )
+
       P( s_cola )
       push( cola, id )
       V( s_cola )
       V( s_timer[ id ] )
-      P( s_condiciones[ id  ] )
+
+      P( s_turno[ id  ] )
       
       P( s_estados[ id ] )
-      if ( estados[ id ]= "descargando" )
+      if ( estados[ id ] <> "me fui" )
+        estados[ id ]= "descargando" 
         V( s_estados[ id ] )
         descargarCamion( id )
-        while (condicion)
-          if (cola.empty!)
-            p(s_cola)
-            pop (cola,next_id)
-            v(s_cola)
-            if (estado[next_id]="en cola")
-              V(s_condicion[next_id])
-
+        P( s_estados[ id ] )
       V( s_estados[ id ] )
         
-    process acopiadora
+      descargarCamion( id )
+
+      if ( cola.not_empty )
+        P( s_cola )
+        pop( cola,next_id )
+        if ( estado[ next_id ]= "esperando" )
+          V( s_turno[ next_id ] )
+        V( s_cola )
+
+     process timer [ t= 1 to N ] 
+      P( s_timer[ t ] )
+      DELAY( 2hs )
+      P( s_estados[ t ] )
+      if ( estado[ t ] == "esperando" )
+        estado[ t ]= "me fui"
+        V( s_turno[ t ] )
+      V( s_estados[ t ] )
 
