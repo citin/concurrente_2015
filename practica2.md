@@ -202,7 +202,7 @@
             estado[ id_alu ] = "en correcion"
             V( s_estado[ id_alu ] )
             V( esperando[id_alu] ) 
-            P( tareas[ id_alu ] ) 
+            P( tareas[ id_alu ] ) /// falta agregar una variable compartida para que el alumno pase la tarea
             corregirTarea(id_alu)
             V( esperando[id_alu] ) 
           else
@@ -240,7 +240,7 @@
         tarea= tomarTarea(  ) 
         P( s_tareas )
         tareas++
-        V( s_tareas )
+        V( s_tareas ) 
         hacerTarea( tarea )
         tareas_x_empleado[ id ]++  ///////hacer otra barrera
       }
