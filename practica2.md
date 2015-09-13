@@ -4,47 +4,48 @@
   acceso de la persona al detector (es decir si el detector esta libre la
   persona lo puede utilizar caso contrario debe esperar).
 
-sem e = 1  
-### process P [i= 1 to n]
-  P(e)
-  -- Ingreso al detector
-  V(e)
-  -- Ingreso al avion
+    sem e = 1  
+    process P [i= 1 to n]
+    P(e)
+    -- Ingreso al detector
+    V(e)
+    -- Ingreso al avion
 
-  b) Modifique su solución para que funcione en el caso que el detector pueda controlar a tres
+  b) Modifique su solución para que funcione en el caso que el detector pueda
+  controlar a tres
   personas a la vez.
 
-sem e = 3
-### process P [i= 1 to n]
-  P(e)
-  -- Ingreso al detector
-  V(e)
-  -- Ingreso al avion
+    sem e = 3
+    process P [i= 1 to n]
+    P(e)
+    -- Ingreso al detector
+    V(e)
+    -- Ingreso al avion
 
 # Ejercicio 2:
   Un sistema operativo mantiene 5 instancias de un recurso almacenadas en una
   cola, cuando un proceso necesita usar una instancia del recurso la saca de la
   cola, la usa y cuando termina de usarla la vuelve a depositar.
 
-Cola buffer
-sem e = 1
-sem recurso = 5
+    Cola buffer
+    sem e = 1
+    sem recurso = 5
 
-### process proceso [i = 1 to n]
+    process proceso [i = 1 to n]
 
-  P(recurso)
+    P(recurso)
 
-  P(e)
-  push(buffer, i)
-  V(e)
-  
-  --Uso recurso
-  
-  P(e)
-  pop(buffer, i)
-  V(e)
+    P(e)
+    push(buffer, i)
+    V(e)
+    
+    --Uso recurso
+    
+    P(e)
+    pop(buffer, i)
+    V(e)
 
-  V(recurso)
+    V(recurso)
 
 
 # Ejercicio 3:
@@ -56,49 +57,49 @@ sem recurso = 5
   realice la corrección nuevamente, esto se repite hasta que la tarea no tenga
   errores.
 
-alumnoActual, tareas[40], notas[40]= 0,
-sem tarea_asignada[40] = 0
-sem esperando_nota[40] = 0
-sem e = 1
-sem profe = 0
+    alumnoActual, tareas[40], notas[40]= 0,
+    sem tarea_asignada[40] = 0
+    sem esperando_nota[40] = 0
+    sem e = 1
+    sem profe = 0
 
-###process alumno [i = 1 to 40]
+    process alumno [i = 1 to 40]
 
-> Espero hasta que tenga tarea asignada
-  P( tarea_asignada[i] )
-  
-  while (no_aprobe) {
-    tareas[i]= hacerTarea()
-    P( e )
-    alumnoActual = i
-    V( profe )
-    P(esperando_nota[i])
-  }
+    > Espero hasta que tenga tarea asignada
+      P( tarea_asignada[i] )
+      
+      while (no_aprobe) {
+        tareas[i]= hacerTarea()
+        P( e )
+        alumnoActual = i
+        V( profe )
+        P(esperando_nota[i])
+      }
 
-###process maestra
+    process maestra
 
-> Asigno tarea a todos los alumnos
-  for i = 0 to 39
-    V( tarea_asignada[i] )
-  while( True ) {
-    P( profe )
-    nota[ alumnoActual ] = corregir( tareas[ alumnoActual ] )
-    V( e )
-    V( esperando_nota[i] )
-  }
+    > Asigno tarea a todos los alumnos
+      for i = 0 to 39
+        V( tarea_asignada[i] )
+      while( True ) {
+        P( profe )
+        nota[ alumnoActual ] = corregir( tareas[ alumnoActual ] )
+        V( e )
+        V( esperando_nota[i] )
+      }
 
 # Ejercicio 4:
-    Suponga que se tiene un curso con 50 alumnos. Cada alumno elije una de las
-    10 tareas para realizar entre todos. Una vez que todos los alumnos
-    eligieron su tarea comienzan a realizarla. Cada vez que un alumno termina
-    su tarea le avisa al profesor y si todos los alumnos que tenían la misma
-    tarea terminaron el profesor les otorga un puntaje que representa el orden
-    en que se terminó esa tarea.  
-    _Nota_: Para elegir la tarea suponga que existe una función elegir que le
-    asigna una tarea a un alumno (esta función asignará 10 tareas diferentes
-    entre 50 alumnos, es decir, que 5 alumnos tendrán la tarea 1, otros 5 la
-    tarea 2 y así sucesivamente para las 10 tareas). El tiempo en un alumno
-    tarda en realizar la tarea es random.
+  Suponga que se tiene un curso con 50 alumnos. Cada alumno elije una de las
+  10 tareas para realizar entre todos. Una vez que todos los alumnos
+  eligieron su tarea comienzan a realizarla. Cada vez que un alumno termina
+  su tarea le avisa al profesor y si todos los alumnos que tenían la misma
+  tarea terminaron el profesor les otorga un puntaje que representa el orden
+  en que se terminó esa tarea.  
+  _Nota_: Para elegir la tarea suponga que existe una función elegir que le
+  asigna una tarea a un alumno (esta función asignará 10 tareas diferentes
+  entre 50 alumnos, es decir, que 5 alumnos tendrán la tarea 1, otros 5 la
+  tarea 2 y así sucesivamente para las 10 tareas). El tiempo en un alumno
+  tarda en realizar la tarea es random.
 
     cont= 0
     tareas_terminadas[10]= 0
@@ -106,7 +107,8 @@ sem profe = 0
     todos= 0
     tarea_en_cuestion= 0
     notas[10]= 0
-### process alumno[ i= 1 to 10 ]
+
+    process alumno[ i= 1 to 10 ]
     tarea_asignada= elegir()
     > Espero que todos tengan su tarea asignada
     P( e )
@@ -124,7 +126,7 @@ sem profe = 0
     tarea_en_cuestion= tarea_asignada
     V( profedor )
 
-### process profesor
+    process profesor
     nota_actual= 10
     termino= false
     while ( !termino ) {
@@ -138,76 +140,76 @@ sem profe = 0
     }
     
 # Ejercicio 5: 
-    Existen N alumnos que desean consultar a alguno de los A ayudantes en una
-    práctica. Para esto cada alumno se agrega en una cola para consultas. Si
-    una vez que el alumno se agregó en la cola pasaron más de 15 minutos el
-    mismo se retira; por el contrario si fue atendido por un ayudante, entonces
-    el alumno le entrega su ejercicio resuelto y espera la opinión del
-    ayudante. Si el ejercicio estaba correcto el alumno se retira, en caso que
-    tenga que modificarlo, realiza las modificaciones y vuelve a agregarse a la
-    cola (Ya no debe tenerse en cuenta lo de los 15 minutos).  
-    Nota: Suponga que existe una función que devuelve si un alumno hizo bien o
-    mal el ejercicio. El alumno no decide a cual ayudante le consulta. Los 15
-    minutos solo deben tenerse en cuenta la primera vez, es decir, si el alumno
-    fue atendido ya no se toma más en cuenta el tiempo.
+  Existen N alumnos que desean consultar a alguno de los A ayudantes en una
+  práctica. Para esto cada alumno se agrega en una cola para consultas. Si
+  una vez que el alumno se agregó en la cola pasaron más de 15 minutos el
+  mismo se retira; por el contrario si fue atendido por un ayudante, entonces
+  el alumno le entrega su ejercicio resuelto y espera la opinión del
+  ayudante. Si el ejercicio estaba correcto el alumno se retira, en caso que
+  tenga que modificarlo, realiza las modificaciones y vuelve a agregarse a la
+  cola (Ya no debe tenerse en cuenta lo de los 15 minutos).  
+  Nota: Suponga que existe una función que devuelve si un alumno hizo bien o
+  mal el ejercicio. El alumno no decide a cual ayudante le consulta. Los 15
+  minutos solo deben tenerse en cuenta la primera vez, es decir, si el alumno
+  fue atendido ya no se toma más en cuenta el tiempo.
 
-sem s_cola= 1
-sem s_estado[N]= 1
-sem s_timer[N]= 0
-sem esperando[N]= 0  'espera por las dos condiciones'
-sem tareas[N]= 0     'tareas para corregir'
-estado[ N ]= ""
-Cola cola
+    sem s_cola= 1
+    sem s_estado[N]= 1
+    sem s_timer[N]= 0
+    sem esperando[N]= 0  'espera por las dos condiciones'
+    sem tareas[N]= 0     'tareas para corregir'
+    estado[ N ]= ""
+    Cola cola
 
-### process alumno [ id= 1 to N ]
-  P( s_cola )
-  estado[ id ]= "en cola"
-  push( cola, id )
-  V( s_cola )
-  > aviso al timer que llegue
-  V( s_timer[ id ] )
-  > Espero x las condiciones
-  P( esperando[id] )
-  P( s_estado[id] )
-  > si estroy corrigiendo (sino me fui por timer, saltea while)
-  while (estado[ id ]= "en correccion") {
-    > habilito el ayudante para que me corrija
-    V( s_estado[id] )
-    V( tareas[ id ] ) 
-    P( esperando[ id ] )
-    P( s_estado[id] )
-  }        
-  V( s_estado[id] )
-
-### process timer [ id= 1 to N ]
-  P( s_timer[ id ] )
-  DELAY( 15 )
-  P( s_estado[id] )
-  if estado[ id ] == "en cola"
-    estado[ id ]= "me fui"
-    V( esperando[ id ] )
-  V( s_estado[id] )
-  
-### process ayudante [ id= 1 to A ]
-  
-  while( true ) { //////usar semaforo en vez
-    P( s_cola )
-    if ( cola.not_empty )
-      pop(cola, id_alu)
+     process alumno [ id= 1 to N ]
+      P( s_cola )
+      estado[ id ]= "en cola"
+      push( cola, id )
       V( s_cola )
-      P( s_estado[ id_alu ] )
-      if ( estado[ id_alu ] == "en cola" )
-        estado[ id_alu ] = "en correcion"
-        V( s_estado[ id_alu ] )
-        V( esperando[id_alu] ) 
-        P( tareas[ id_alu ] ) 
-        corregirTarea(id_alu)
-        V( esperando[id_alu] ) 
-      else
-        V( s_estado[ id_alu ] )
-    else
-      V( s_cola )
-  }
+      > aviso al timer que llegue
+      V( s_timer[ id ] )
+      > Espero x las condiciones
+      P( esperando[id] )
+      P( s_estado[id] )
+      > si estroy corrigiendo (sino me fui por timer, saltea while)
+      while (estado[ id ]= "en correccion") {
+        > habilito el ayudante para que me corrija
+        V( s_estado[id] )
+        V( tareas[ id ] ) 
+        P( esperando[ id ] )
+        P( s_estado[id] )
+      }        
+      V( s_estado[id] )
+
+     process timer [ id= 1 to N ]
+      P( s_timer[ id ] )
+      DELAY( 15 )
+      P( s_estado[id] )
+      if estado[ id ] == "en cola"
+        estado[ id ]= "me fui"
+        V( esperando[ id ] )
+      V( s_estado[id] )
+      
+     process ayudante [ id= 1 to A ]
+      
+      while( true ) { //////usar semaforo en vez
+        P( s_cola )
+        if ( cola.not_empty )
+          pop(cola, id_alu)
+          V( s_cola )
+          P( s_estado[ id_alu ] )
+          if ( estado[ id_alu ] == "en cola" )
+            estado[ id_alu ] = "en correcion"
+            V( s_estado[ id_alu ] )
+            V( esperando[id_alu] ) 
+            P( tareas[ id_alu ] ) 
+            corregirTarea(id_alu)
+            V( esperando[id_alu] ) 
+          else
+            V( s_estado[ id_alu ] )
+        else
+          V( s_cola )
+      }
 
 # Ejercicio 6: 
   A una empresa llegan E empleados y por día hay T tareas para hacer (T>E), una
@@ -217,31 +219,31 @@ Cola cola
   le da un premio al empleado que más tareas realizó.
 
 
-sem s_todos= 1
-sem s_tareas= 1
-sem todos= 0
-cont= 0
-tareas= 0
-tareas_x_empleado[E]= 0
-### process empleados [id= 1 to E]
-  P( s_todos )
-  cont++
-  if cont < E
-    V( s_todos )
-    P( todos )
-  else
-    V( s_todos )
-    for i= 1 to E-1
-      V( todos )
-> Aca siguen todos juntos.
-  while ( tareas < T ){
-    tarea= tomarTarea(  ) 
-    P( s_tareas )
-    tareas++
-    V( s_tareas )
-    hacerTarea( tarea )
-    tareas_x_empleado[ id ]++  ///////hacer otra barrera
-  }
+    sem s_todos= 1
+    sem s_tareas= 1
+    sem todos= 0
+    cont= 0
+    tareas= 0
+    tareas_x_empleado[E]= 0
+     process empleados [id= 1 to E]
+      P( s_todos )
+      cont++
+      if cont < E
+        V( s_todos )
+        P( todos )
+      else
+        V( s_todos )
+        for i= 1 to E-1
+          V( todos )
+    > Aca siguen todos juntos.
+      while ( tareas < T ){
+        tarea= tomarTarea(  ) 
+        P( s_tareas )
+        tareas++
+        V( s_tareas )
+        hacerTarea( tarea )
+        tareas_x_empleado[ id ]++  ///////hacer otra barrera
+      }
 
 # Ejercicio 7:
   Suponga que hay N tareas que se realizan en forma diaria por los operarios de
@@ -259,40 +261,40 @@ tareas_x_empleado[E]= 0
   que cada operario tarda en hacer cada elemento es diferente y random.
   Maximice la concurrencia.
 
-sem s_cinco= 1
-sem cinco= 0
-sem tarea_grupo[ N ]
-cont= 0
-tarea_actual= 1
-### process operario[ id= 1 to N ]
-  P( s_cinco )
-  if ( cont < 5 )
-    cont++
-    V( s_cinco )
-    P( cinco )
-  else
+    sem s_cinco= 1
+    sem cinco= 0
+    sem tarea_grupo[ N ]
     cont= 0
-    V( s_cinco )
-    for i= 1 to 4
-      V( cinco )
+    tarea_actual= 1
+     process operario[ id= 1 to N ]
+      P( s_cinco )
+      if ( cont < 5 )
+        cont++
+        V( s_cinco )
+        P( cinco )
+      else
+        cont= 0
+        V( s_cinco )
+        for i= 1 to 4
+          V( cinco )
 
-> Aca se formo un grupo de cinco
-  
-  tarea= obtenerTarea(  )
+    > Aca se formo un grupo de cinco
+      
+      tarea= obtenerTarea(  )
 
-sem s_cola= 1
-sem tarea[ N ]= 0
-Cola cola
-### process operario[ id= 1 to N ]
-  P( s_cola )
-  push( cola, id )
-  V( s_cola )
-  P( tarea[ id ] )
+    sem s_cola= 1
+    sem tarea[ N ]= 0
+    Cola cola
+     process operario[ id= 1 to N ]
+      P( s_cola )
+      push( cola, id )
+      V( s_cola )
+      P( tarea[ id ] )
 
-### process fabrica
-  while true { 
-    P( s_cola )
-    pop( cola, id )
-    V( s_cola )
-    
-  }
+     process fabrica
+      while true { 
+        P( s_cola )
+        pop( cola, id )
+        V( s_cola )
+        
+      }
