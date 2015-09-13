@@ -262,50 +262,121 @@
   que cada operario tarda en hacer cada elemento es diferente y random.
   Maximice la concurrencia.
 
-    sem s_cinco= 1
-    sem cinco= 0
-    sem tarea_grupo[ N ]
-    cont= 0
-    tarea_actual= 1
-     process operario[ id= 1 to N ]
-      P( s_cinco )
-      if ( cont < 5 )
-        cont++
-        V( s_cinco )
-        P( cinco )
-      else
-        cont= 0
-        V( s_cinco )
-        for i= 1 to 4
-          V( cinco )
+    sem s_operario[ M ]= 0   
+    
+    tarea_asignada[ M ]= 0
+    sem s_tarea_asignada[M]= 1
+    
+    tarea_operarios[ N, op[1..5] ] = [0, 0]
 
-    > Aca se formo un grupo de cinco
-      
-      tarea= obtenerTarea(  )
+    elementos_tarea[ N ]= 0
+    sem s_elementos_tarea[N]= 1
+
+    sem s_barrera[N]=0
+    contador_barrera[N]=0
+    sem s_e_contador[N]=1
 
     sem s_cola= 1
-    sem tarea[ N ]= 0
     Cola cola
-     process operario[ id= 1 to N ]
+
+     process operario[ id= 1 to M ]
+      var mi_tarea
+
       P( s_cola )
       push( cola, id )
       V( s_cola )
-      P( tarea[ id ] )
-
-     process fabrica
-      while true { 
-        P( s_cola )
-        pop( cola, id )
-        V( s_cola )
-        
+      P( s_operario[id] )
+      > me asignaron tarea en tarea_asignada[id]
+      > producir elementos
+      P( s_tarea_asignada[id] )
+      mi_tarea= s_tarea_asignada[id] 
+      V( s_tarea_asignada[id] )
+      P(s_elemento_tarea[mi_tarea])
+      > mientras no se termino la tarea produzco elementos
+      while ( elementos_tarea[mi_tarea] < X ){
+        elemento_tarea[mi_tarea]++
+        V(s_elemento_tarea[mi_tarea])
+        producirElemento( mi_tarea )
       }
+      > espero que terminen de producir el elemento 
+      P(s_e_contador[mi_tarea])
+      contador_barrera[mi_tarea]++
+      if (contador_barrera[mi_tarea] < 5)
+        V(s_e_contador[mi_tarea])
+        P(s_barrera[mi_tarea])
+      else
+        for i=1 to 4
+          V(s_barrera[mi_tarea])
+      > se retira el grupo
+
+      process fabrica
+      cont_empleados= 0
+      cont_cinco= 0
+      tarea = 1
+
+      while ( cont_empleados < M ) { 
+        P( s_cola )
+        if ( cola.not_empty )
+          pop( cola, id )
+          V( s_cola )
+          cont_empleados++
+          cont_cinco++
+          if ( cont_cinco <= 5)
+            P(s_tarea_asignada[ id ])
+            tarea_asignada[ id ]= tarea  
+            V( s_tarea_asignada[ id ] )
+            push( cola_grupo, id )
+          if ( cont_cinco == 5 )
+            for g = 1 to 5  
+              pop( cola_grupo, id ) 
+              V( s_operario[ id ] )  
+            tarea++
+            cont_cinco = 0
+        }
 
 ## Ejercicio 8:
-  Resolver el siguiente problema. Existen N camiones que deben descargar
-  cereales en una acopiadora. Los camiones se descargan de a uno por vez, y de
-  acuerdo al orden de llegada. Una vez que el camión llegó, espera a lo sumo 2
-  hs. a que le llegue su turno para comenzar a descargar su cereal, sino se
-  retira sin realizar la descarga.
-  Cuando un camión termina de realizar la descarga de su contenido, se debe
-  encargar de avisarle al siguiente camión (en caso de que haya alguno
-  esperando) que le llegó su turno para descargar.
+
+Resolver el siguiente problema. Existen N camiones que deben descargar
+cereales en una acopiadora. Los camiones se descargan de a uno por vez, y de
+acuerdo al orden de llegada. Una vez que el camión llegó, espera a lo sumo 2
+hs. a que le llegue su turno para comenzar a descargar su cereal, sino se
+retira sin realizar la descarga.
+Cuando un camión termina de realizar la descarga de su contenido, se debe
+encargar de avisarle al siguiente camión (en caso de que haya alguno
+esperando) que le llegó su turno para descargar.
+
+    Cola cola
+    sem s_cola= 1
+
+    sem s_condiciones[ N ]= 0
+    sem s_timer[ N ]
+    
+    estados[ N ] = ""
+    sem s_esados[ N ]= 1
+
+    process camion [ id= 1 to N ] 
+      P( s_estados[ id ] )
+      estados[ id ]= "en cola"
+      V( s_estados[ id ] )
+      P( s_cola )
+      push( cola, id )
+      V( s_cola )
+      V( s_timer[ id ] )
+      P( s_condiciones[ id  ] )
+      
+      P( s_estados[ id ] )
+      if ( estados[ id ]= "descargando" )
+        V( s_estados[ id ] )
+        descargarCamion( id )
+        while (condicion)
+          if (cola.empty!)
+            p(s_cola)
+            pop (cola,next_id)
+            v(s_cola)
+            if (estado[next_id]="en cola")
+              V(s_condicion[next_id])
+
+      V( s_estados[ id ] )
+        
+    process acopiadora
+
