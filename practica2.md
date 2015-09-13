@@ -1,4 +1,4 @@
-# Ejercicio 1:
+## Ejercicio 1:
   a) Existen N personas que deben ser chequeadas por un detector de metales
   antes de poder ingresar al avión. Implemente una solución que modele solo el
   acceso de la persona al detector (es decir si el detector esta libre la
@@ -22,7 +22,7 @@
     V(e)
     -- Ingreso al avion
 
-# Ejercicio 2:
+## Ejercicio 2:
   Un sistema operativo mantiene 5 instancias de un recurso almacenadas en una
   cola, cuando un proceso necesita usar una instancia del recurso la saca de la
   cola, la usa y cuando termina de usarla la vuelve a depositar.
@@ -48,7 +48,7 @@
     V(recurso)
 
 
-# Ejercicio 3:
+## Ejercicio 3:
   Se tiene un curso con 40 alumnos, la maestra entrega una tarea distinta a
   cada alumno, luego cada alumno realiza su tarea y se la entrega a la maestra
   para que la corrija, esta revisa la tarea y si está bien le avisa al alumno
@@ -88,13 +88,13 @@
         V( esperando_nota[i] )
       }
 
-# Ejercicio 4:
+## Ejercicio 4:
   Suponga que se tiene un curso con 50 alumnos. Cada alumno elije una de las
   10 tareas para realizar entre todos. Una vez que todos los alumnos
   eligieron su tarea comienzan a realizarla. Cada vez que un alumno termina
   su tarea le avisa al profesor y si todos los alumnos que tenían la misma
   tarea terminaron el profesor les otorga un puntaje que representa el orden
-  en que se terminó esa tarea.  
+  en que se terminó esa tarea. 
   _Nota_: Para elegir la tarea suponga que existe una función elegir que le
   asigna una tarea a un alumno (esta función asignará 10 tareas diferentes
   entre 50 alumnos, es decir, que 5 alumnos tendrán la tarea 1, otros 5 la
@@ -138,8 +138,7 @@
       if ( nota_actual == 0 ) 
         termine= true        
     }
-    
-# Ejercicio 5: 
+## Ejercicio 5: 
   Existen N alumnos que desean consultar a alguno de los A ayudantes en una
   práctica. Para esto cada alumno se agrega en una cola para consultas. Si
   una vez que el alumno se agregó en la cola pasaron más de 15 minutos el
@@ -147,8 +146,8 @@
   el alumno le entrega su ejercicio resuelto y espera la opinión del
   ayudante. Si el ejercicio estaba correcto el alumno se retira, en caso que
   tenga que modificarlo, realiza las modificaciones y vuelve a agregarse a la
-  cola (Ya no debe tenerse en cuenta lo de los 15 minutos).  
-  Nota: Suponga que existe una función que devuelve si un alumno hizo bien o
+  cola (Ya no debe tenerse en cuenta lo de los 15 minutos).
+  _Nota_: Suponga que existe una función que devuelve si un alumno hizo bien o
   mal el ejercicio. El alumno no decide a cual ayudante le consulta. Los 15
   minutos solo deben tenerse en cuenta la primera vez, es decir, si el alumno
   fue atendido ya no se toma más en cuenta el tiempo.
@@ -158,30 +157,33 @@
     sem s_timer[N]= 0
     sem esperando[N]= 0  'espera por las dos condiciones'
     sem tareas[N]= 0     'tareas para corregir'
+    sem s_hay= 0
     estado[ N ]= ""
     Cola cola
 
-     process alumno [ id= 1 to N ]
-      P( s_cola )
-      estado[ id ]= "en cola"
-      push( cola, id )
-      V( s_cola )
-      > aviso al timer que llegue
-      V( s_timer[ id ] )
-      > Espero x las condiciones
-      P( esperando[id] )
-      P( s_estado[id] )
-      > si estroy corrigiendo (sino me fui por timer, saltea while)
-      while (estado[ id ]= "en correccion") {
-        > habilito el ayudante para que me corrija
-        V( s_estado[id] )
-        V( tareas[ id ] ) 
-        P( esperando[ id ] )
-        P( s_estado[id] )
-      }        
+    process alumno [ id= 1 to N ]
+    P( s_cola )
+    estado[ id ]= "en cola"
+    push( cola, id )
+    V( s_hay )     
+    V( s_cola )
+    > aviso al timer que llegue
+    V( s_timer[ id ] )
+    > Espero x las condiciones
+    P( esperando[id] )
+    P( s_estado[id] )
+    > si estroy corrigiendo (sino me fui por timer, saltea while)
+    while (estado[ id ]= "en correccion") {
+      > habilito el ayudante para que me corrija
       V( s_estado[id] )
+      V( tareas[ id ] ) 
+      P( esperando[ id ] )
+      P( s_estado[id] )
+    }        
+    V( s_estado[id] )
 
      process timer [ id= 1 to N ]
+     while ( true ) {
       P( s_timer[ id ] )
       DELAY( 15 )
       P( s_estado[id] )
@@ -189,10 +191,11 @@
         estado[ id ]= "me fui"
         V( esperando[ id ] )
       V( s_estado[id] )
+      }
       
      process ayudante [ id= 1 to A ]
-      
-      while( true ) { //////usar semaforo en vez
+
+     P( s_hay )     
         P( s_cola )
         if ( cola.not_empty )
           pop(cola, id_alu)
@@ -211,13 +214,12 @@
           V( s_cola )
       }
 
-# Ejercicio 6: 
+## Ejercicio 6: 
   A una empresa llegan E empleados y por día hay T tareas para hacer (T>E), una
   vez que todos los empleados llegaron empezaran a trabajar. Mientras haya
   tareas para hacer los empleados tomaran una y la realizarán. Cada empleado
   puede tardar distinto tiempo en realizar cada tarea. Al finalizar el día se
   le da un premio al empleado que más tareas realizó.
-
 
     sem s_todos= 1
     sem s_tareas= 1
@@ -245,7 +247,7 @@
         tareas_x_empleado[ id ]++  ///////hacer otra barrera
       }
 
-# Ejercicio 7:
+## Ejercicio 7:
   Suponga que hay N tareas que se realizan en forma diaria por los operarios de
   una fábrica. Suponga que existen M operarios (M = Nx5). Cada tarea se realiza
   de a grupos de 5 operarios, ni bien llegan a la fábrica se juntan de a 5 en
@@ -255,9 +257,8 @@
   hayan realizado exactamente X entre los operarios del grupo. Una vez que
   terminaron de producir los X elementos, se juntan los 5 operarios del grupo y
   se retiran.  Tenga en cuenta que pueden salir varios grupos de operarios al
-  mismo tiempo y que no debe interferir con la entrada.  
-  
-  Nota: cada operario puede hacer 0, 1 o más elementos de una tarea. El tiempo
+  mismo tiempo y que no debe interferir con la entrada.
+  _Nota_: cada operario puede hacer 0, 1 o más elementos de una tarea. El tiempo
   que cada operario tarda en hacer cada elemento es diferente y random.
   Maximice la concurrencia.
 
@@ -298,3 +299,13 @@
         V( s_cola )
         
       }
+
+## Ejercicio 8:
+  Resolver el siguiente problema. Existen N camiones que deben descargar
+  cereales en una acopiadora. Los camiones se descargan de a uno por vez, y de
+  acuerdo al orden de llegada. Una vez que el camión llegó, espera a lo sumo 2
+  hs. a que le llegue su turno para comenzar a descargar su cereal, sino se
+  retira sin realizar la descarga.
+  Cuando un camión termina de realizar la descarga de su contenido, se debe
+  encargar de avisarle al siguiente camión (en caso de que haya alguno
+  esperando) que le llegó su turno para descargar.
