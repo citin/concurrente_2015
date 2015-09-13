@@ -58,9 +58,10 @@ sem recurso = 5
 
 alumnoActual, tareas[40], notas[40]= 0,
 sem tarea_asignada[40] = 0
+sem esperando_nota[40] = 0
 sem e = 1
 sem profe = 0
-sem esperando_nota = 0
+
 ###process alumno [i = 1 to 40]
 
 > Espero hasta que tenga tarea asignada
@@ -71,19 +72,19 @@ sem esperando_nota = 0
     P( e )
     alumnoActual = i
     V( profe )
-    P(esperando_nota)
+    P(esperando_nota[i])
   }
 
-#process maestra
+###process maestra
 
 > Asigno tarea a todos los alumnos
   for i = 0 to 39
-    V( tarea[i] )
+    V( tarea_asignada[i] )
   while( True ) {
     P( profe )
     nota[ alumnoActual ] = corregir( tareas[ alumnoActual ] )
     V( e )
-    V( esperando_nota )
+    V( esperando_nota[i] )
   }
 
 # Ejercicio 4:
@@ -151,7 +152,7 @@ sem esperando_nota = 0
     fue atendido ya no se toma más en cuenta el tiempo.
 
 sem s_cola= 1
-sem s_estado= 1
+sem s_estado[N]= 1
 sem s_timer[N]= 0
 sem esperando[N]= 0  'espera por las dos condiciones'
 sem tareas[N]= 0     'tareas para corregir'
@@ -163,33 +164,33 @@ Cola cola
   estado[ id ]= "en cola"
   push( cola, id )
   V( s_cola )
-> aviso al timer que llegue
+  > aviso al timer que llegue
   V( s_timer[ id ] )
-> Espero x las condiciones
+  > Espero x las condiciones
   P( esperando[id] )
-  P( s_estado )                                ###__???__
-> si estroy corrigiendo (sino me fui por timer, saltea while)
+  P( s_estado[id] )
+  > si estroy corrigiendo (sino me fui por timer, saltea while)
   while (estado[ id ]= "en correccion") {
->   habilito el ayudante para que me corrija
-    V( s_estado )
+    > habilito el ayudante para que me corrija
+    V( s_estado[id] )
     V( tareas[ id ] ) 
     P( esperando[ id ] )
-    P( s_estad )
+    P( s_estado[id] )
   }        
-  V( s_estado )
+  V( s_estado[id] )
 
 ### process timer [ id= 1 to N ]
   P( s_timer[ id ] )
   DELAY( 15 )
-  P( s_estado )
+  P( s_estado[id] )
   if estado[ id ] == "en cola"
     estado[ id ]= "me fui"
     V( esperando[ id ] )
-  V( s_estado )
+  V( s_estado[id] )
   
 ### process ayudante [ id= 1 to A ]
   
-  while( true ) { 
+  while( true ) { //////usar semaforo en vez
     P( s_cola )
     if ( cola.not_empty )
       pop(cola, id_alu)
@@ -239,7 +240,7 @@ tareas_x_empleado[E]= 0
     tareas++
     V( s_tareas )
     hacerTarea( tarea )
-    tareas_x_empleado[ id ]++
+    tareas_x_empleado[ id ]++  ///////hacer otra barrera
   }
 
 # Ejercicio 7:
